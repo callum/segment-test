@@ -14,8 +14,7 @@ export default function segmentsReducer (segments = initialSegments, action) {
         Object.assign({}, segment, { value: action.value }) : segment)
 
   case 'DELETE_SEGMENT':
-    return segments.filter(segment =>
-      segment.id !== action.id)
+    return segments.filter(segment => segment.id !== action.id)
 
   default:
     return segments

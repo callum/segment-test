@@ -2,12 +2,12 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { createStore, combineReducers } from 'redux'
 import { Provider } from 'react-redux'
-import focusedReducer from './reducers/focused'
+import focusReducer from './reducers/focus'
 import segmentsReducer from './reducers/segments'
 import Root from './components/Root'
 
 const store = createStore(combineReducers({
-  focused: focusedReducer,
+  focus: focusReducer,
   segments: segmentsReducer
 }))
 

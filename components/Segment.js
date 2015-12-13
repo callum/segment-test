@@ -1,53 +1,54 @@
 import React, { Component } from 'react'
 import Textarea from 'react-textarea-autosize'
-import { focusSegment, blurSegment } from '../actions/focused'
+import { activateFocus, deactivateFocus } from '../actions/focus'
 import { createSegment, updateSegment, deleteSegment } from '../actions/segments'
 
 class Segment extends Component {
   componentDidUpdate (prevProps) {
-    const { focused, segment } = this.props
+    const { props } = this
 
-    if (focused === segment.id && focused !== prevProps.focused) {
+    if (props.focus === props.segment.id && props.focus !== prevProps.focus) {
       this.textarea.focus()
     }
   }
 
   handleFocus () {
-    const { segment, dispatch } = this.props
-    dispatch(focusSegment(segment.id))
+    const { props } = this
+    props.activateFocus(props.segment.id)
   }
 
   handleBlur () {
-    const { segment, dispatch } = this.props
-    dispatch(blurSegment(segment.id))
+    const { props } = this
+    props.deactivateFocus(props.segment.id)
   }
 
   handleKeyDown (event) {
-    const { segment, prevSegment, nextSegment, dispatch } = this.props
+    const { props } = this
 
     // press down or right at the end of the text
-    if (nextSegment &&
+    if (props.nextSegment &&
         event.target.selectionEnd === event.target.value.length &&
         (event.keyCode === 39 || event.keyCode === 40)) {
-      dispatch(focusSegment(nextSegment.id))
+      props.activateFocus(props.nextSegment.id)
       event.preventDefault()
       return
     }
 
     // press up or left at the start of the text
-    if (prevSegment &&
+    if (props.prevSegment &&
         event.target.selectionEnd === 0 &&
         (event.keyCode === 37 || event.keyCode === 38)) {
-      dispatch(focusSegment(prevSegment.id))
+      activateFocus(props.prevSegment.id)
       event.preventDefault()
       return
     }
 
     // press backspace at the start of the text
-    if (prevSegment && event.target.selectionEnd === 0 && event.keyCode === 8) {
-      dispatch(updateSegment(prevSegment.id, prevSegment.value + segment.value))
-      dispatch(focusSegment(prevSegment.id))
-      dispatch(deleteSegment(segment.id))
+    if (props.prevSegment && event.target.selectionEnd === 0 && event.keyCode === 8) {
+      props.updateSegment(props.prevSegment.id,
+        props.prevSegment.value + props.segment.value)
+      props.activateFocus(props.prevSegment.id)
+      props.deleteSegment(props.segment.id)
       event.preventDefault()
       return
     }
@@ -55,28 +56,28 @@ class Segment extends Component {
     // press enter at the end of the text
     if (event.target.selectionEnd === event.target.value.length &&
         event.keyCode === 13) {
-      dispatch(createSegment(''))
+      props.createSegment('')
       event.preventDefault()
       return
     }
   }
 
   handleChange (event) {
-    const { segment, dispatch } = this.props
+    const { props } = this
     const paragraphs = event.target.value.split(/[\n\r]{2}/g)
 
     if (paragraphs.length > 1) {
       paragraphs.forEach((paragraph, i) => {
         if (i === 0) {
-          dispatch(updateSegment(segment.id, paragraph))
+          props.updateSegment(props.segment.id, paragraph)
         } else {
-          dispatch(createSegment(paragraph))
+          props.createSegment(paragraph)
         }
       })
       return
     }
 
-    dispatch(updateSegment(segment.id, event.target.value))
+    props.updateSegment(props.segment.id, event.target.value)
   }
 
   render () {
